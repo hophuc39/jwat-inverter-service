@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package inverter;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+message Inverter {
+  string id = 1;
+  string inverterCode = 2;
+  string inverterName = 3;
+  string slaveAddress = 4;
+  string startAddress = 5;
+  int32 numberOfPoles = 6;
+  google.protobuf.Timestamp updatedDate = 7;
+  bool useFlag = 8;
+}
+
+message CreateInverterInput {
+  string inverterCode = 1;
+  string inverterName = 2;
+  string slaveAddress = 3;
+  string startAddress = 4;
+  int32 numberOfPoles = 5;
+  bool useFlag = 6;
+}
+
+message UpdateInverterInput {
+  string id = 1;
+  string inverterCode = 2;
+  string inverterName = 3;
+  string slaveAddress = 4;
+  string startAddress = 5;
+  int32 numberOfPoles = 6;
+  bool useFlag = 7;
+}
+
+message InverterIdRequest {
+  string id = 1;
+}
+
+message InverterList {
+  repeated Inverter items = 1;
+}
+
+service InverterService {
+  rpc CreateInverter(CreateInverterInput) returns (Inverter);
+  rpc FindAll(google.protobuf.Empty) returns (InverterList);
+  rpc FindOne(InverterIdRequest) returns (Inverter);
+  rpc UpdateInverter(UpdateInverterInput) returns (Inverter);
+  rpc RemoveInverter(InverterIdRequest) returns (Inverter);
+}
