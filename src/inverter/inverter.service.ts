@@ -1,21 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Inverter } from './entities/inverter.entity';
-import { Repository } from 'typeorm';
+import { InverterRepository } from './inverter.repository';
+import {
+  CreateInverterRequest,
+  FindAllInvertersRequest,
+  UpdateInverterRequest,
+} from 'jwat-protobuf/inverter';
+
 @Injectable()
 export class InverterService {
-  constructor(
-    @InjectRepository(Inverter)
-    private readonly inverterRepository: Repository<Inverter>,
-  ) {}
+  constructor(private readonly inverterRepository: InverterRepository) {}
 
-  async findAll() {
-    const inverters = await this.inverterRepository.find();
-    return inverters;
+  async create(request: CreateInverterRequest) {
+    return await this.inverterRepository.createInverter(request);
+  }
+
+  async update(request: UpdateInverterRequest) {
+    return await this.inverterRepository.updateInverter(request);
+  }
+
+  async findAll(request: FindAllInvertersRequest) {
+    return await this.inverterRepository.findAll(request);
   }
 
   async findOne(id: string) {
-    const inverter = await this.inverterRepository.findOneBy({ id });
-    return inverter;
+    return await this.inverterRepository.findById(id);
   }
 }

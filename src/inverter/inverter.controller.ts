@@ -1,30 +1,57 @@
 import { Controller } from '@nestjs/common';
 import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import { InverterService } from './inverter.service';
-import { InverterIdRequest } from 'proto/inverter';
+import {
+  CreateInverterRequest,
+  FindAllInvertersRequest,
+  FindInverterByIdRequest,
+  UpdateInverterRequest,
+} from 'jwat-protobuf/inverter';
 
 @Controller()
 export class InverterController {
   constructor(private readonly inverterService: InverterService) {}
 
-  @GrpcMethod('InverterService', 'FindAll')
-  async findAll() {
-    const inverters = await this.inverterService.findAll();
+  @GrpcMethod('InverterService', 'CreateInverter')
+  async create(request: CreateInverterRequest) {
+    const inverter = await this.inverterService.create(request);
+    return { item: inverter };
+  }
+
+  @GrpcMethod('InverterService', 'UpdateInverter')
+  async update(request: UpdateInverterRequest) {
+    const inverter = await this.inverterService.update(request);
+    return { item: inverter };
+  }
+
+  @GrpcMethod('InverterService', 'FindAllInverters')
+  async findAll(request: FindAllInvertersRequest) {
+    const { page, pageSize } = request;
+    const [items, total] = await this.inverterService.findAll(request);
+
     return {
-      items: Array.isArray(inverters) ? inverters : [],
+      items,
+      pagination: {
+        total,
+        page,
+        pageSize,
+      },
     };
   }
 
-  @GrpcMethod('InverterService', 'FindOne')
-  async findOne(data: InverterIdRequest) {
-    const inverter = await this.inverterService.findOne(data.id);
+  @GrpcMethod('InverterService', 'FindInverterById')
+  async findOne(request: FindInverterByIdRequest) {
+    const { id } = request;
+    const inverter = await this.inverterService.findOne(id);
 
     if (!inverter) {
       throw new RpcException({
-        message: `Inverter with ID ${data.id} not found`,
+        message: `Inverter with ID ${id} not found`,
       });
     }
 
-    return inverter;
+    return {
+      item: inverter,
+    };
   }
 }
